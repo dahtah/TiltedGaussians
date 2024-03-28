@@ -92,4 +92,28 @@ function tilted_moments(mvn :: MvNormal,qr :: QuadRule{D},A::AbstractMatrix,f) w
     (z=z,m=m,C=C)
 end
 
+#Computes the contribution of f to the precision and linear shift
+#Mostly of interest within EP
+function contributions_ep(mvn :: MvNormal,qr :: QuadRule{D},A::AbstractMatrix,f) where D
+    @assert D == size(A,1)
+    @assert length(mvn) == size(A,2)
+    mvc = A*mvn
+    Qc = inv(mvc.Σ)
+    rc = Qc*mvc.μ
+    mm=moments(mvc,qr,f)
+    Qh = inv(mm.C)
+    δQ = Qh-Qc
+    rh = Qh*mm.m
+    δr = rh - rc
+    δz = log_partition(Qh,rh)-log_partition(Qc,rc)
+    (δz=δz,δr=δr,δQ=δQ)
+end
+
+
+function log_partition(Q :: AbstractMatrix,r :: AbstractVector)
+    @assert size(Q,1) == length(r)
+    n = length(r)
+    C=cholesky(Symmetric(Q))
+    .5*(n*log(2π)-logdet(C)+r'*(C\r))
+end
 
