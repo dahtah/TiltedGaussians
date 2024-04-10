@@ -59,7 +59,7 @@ function QuadRule(nrm :: Normal,n,method=:mc)
     d = 1
     qr = QuadRule(d,n,method)
     for i in 1:nnodes(qr)
-        qr.xq[:,i] = nrm.σ*qr.xq[:,i] + nrm.μ
+        qr.xq[i] = nrm.σ*qr.xq[i] + nrm.μ
     end
     qr
 end
