@@ -56,8 +56,6 @@ function moments(mv :: MvNormal,qr :: QuadRule{D},f) where D
     x = zeros(D)
     unwhiten!(qr.xbuf,mv.Σ,qr.xq)
     for i in 1:nnodes(qr)
-        #x .= R*qr.xq[:,i] + b
-        #        x = @view qr.xbuf[:,i]
         x .= qr.xbuf[:,i]+mv.μ
         s = f(x)*qr.wq[i]
         z += s
@@ -97,8 +95,9 @@ end
 function contributions_ep(mvn :: MvNormal,qr :: QuadRule{D},A::AbstractMatrix,f) where D
     @assert D == size(A,1)
     @assert length(mvn) == size(A,2)
-    mvc = A*mvn
-    Qc = inv(mvc.Σ)
+    Σm = A*mvn.Σ*A'
+    mvc = MvNormal(A*mvn.μ,Σm)
+    Qc = inv(Σm)
     rc = Qc*mvc.μ
     mm=moments(mvc,qr,f)
     Qh = inv(mm.C)

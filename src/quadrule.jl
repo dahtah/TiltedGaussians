@@ -55,6 +55,15 @@ function QuadRule(d :: Int, n :: Int, method = :mc)
     end
 end
 
+function QuadRule(nrm :: Normal,n,method=:mc)
+    d = 1
+    qr = QuadRule(d,n,method)
+    for i in 1:nnodes(qr)
+        qr.xq[:,i] = nrm.σ*qr.xq[:,i] + nrm.μ
+    end
+    qr
+end
+
 
 function QuadRule(mv :: MvNormal,n,method=:mc)
     d = length(mv)
